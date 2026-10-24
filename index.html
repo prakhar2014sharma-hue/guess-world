@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guess World 🌍</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: white;
+  background:
+    radial-gradient(circle at top left, #20104b, transparent 40%),
+    radial-gradient(circle at bottom right, #063b50, transparent 35%),
+    #050817;
+}
+
+.game {
+  width: 100%;
+  max-width: 650px;
+  padding: 35px;
+  text-align: center;
+  border: 1px solid #283a78;
+  border-radius: 24px;
+  background: rgba(12, 17, 39, 0.95);
+  box-shadow: 0 0 45px #3820a533;
+}
+
+.logo {
+  font-size: clamp(35px, 8vw, 52px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, #00e5ff, #a855f7);
+  color: transparent;
+  background-clip: text;
+}
+
+h1 {
+  margin: 5px 0 20px;
+  letter-spacing: 5px;
+}
+
+p {
+  color: #aabce9;
+  line-height: 1.6;
+}
+
+.highlight {
+  color: #22d3ee;
+  font-weight: bold;
+}
+
+.entry {
+  display: flex;
+  gap: 12px;
+  margin: 28px 0;
+}
+
+input {
+  min-width: 0;
+  flex: 1;
+  padding: 16px;
+  color: white;
+  font-size: 17px;
+  border: 1px solid #354b91;
+  border-radius: 12px;
+  outline: none;
+  background: #090f25;
+}
+
+input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 10px #22d3ee33;
+}
+
+button {
+  padding: 15px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#guessBtn {
+  color: white;
+  background: linear-gradient(110deg, #06b6d4, #8b5cf6);
+}
+
+button:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 15px;
+  padding: 20px 10px;
+  border: 1px solid #283a78;
+  border-radius: 14px;
+}
+
+.stat {
+  color: #aabce9;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 8px;
+  color: #22d3ee;
+  font-size: 24px;
+}
+
+.message {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #45317e;
+  border-radius: 14px;
+  background: #10152e;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+#resetBtn {
+  margin-top: 18px;
+  color: white;
+  background: #30215b;
+  border: 1px solid #7653c9;
+}
+
+button:disabled,
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+footer {
+  margin-top: 25px;
+  color: #8796c0;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 480px) {
+  .game {
+    padding: 22px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .entry {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="game">
+
+  <div class="logo">GUESS WORLD 🌍</div>
+  <h1>NUMBER GAME</h1>
+
+  <p>
+    Guess a number between
+    <span class="highlight">1 and 50</span>
+  </p>
+
+  <p>You have <span class="highlight">5 chances!</span></p>
+
+  <form id="gameForm">
+    <div class="entry">
+      <input
+        id="guess"
+        type="number"
+        min="1"
+        max="50"
+        step="1"
+        placeholder="Enter your guess..."
+        required
+      >
+      <button id="guessBtn" type="submit">GUESS ↗️</button>
+    </div>
+  </form>
+
+  <div class="stats">
+    <div class="stat">
+      CHANCES LEFT
+      <strong id="chances">5</strong>
+    </div>
+
+    <div class="stat">
+      NUMBER RANGE
+      <strong>1 - 50</strong>
+    </div>
+  </div>
+
+  <div class="message" id="message" aria-live="polite">
+    🎮 Welcome to Guess World!<br>
+    Enter a number and click Guess.
+  </div>
+
+  <button id="resetBtn" type="button">↻ PLAY AGAIN</button>
+
+  <footer>WELCOME TO GUESS WORLD 🌍</footer>
+
+</main>
+
+<script>
+const form = document.getElementById("gameForm");
+const input = document.getElementById("guess");
+const message = document.getElementById("message");
+const chancesText = document.getElementById("chances");
+const guessBtn = document.getElementById("guessBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+let number;
+let chances;
+let gameOver;
+
+function startGame() {
+  number = Math.floor(Math.random() * 50) + 1;
+  chances = 5;
+  gameOver = false;
+
+  input.value = "";
+  input.disabled = false;
+  guessBtn.disabled = false;
+
+  chancesText.textContent = chances;
+
+  message.textContent =
+    "🎮 Welcome to Guess World! Make your first guess.";
+
+  input.focus();
+}
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  if (gameOver) return;
+
+  const guess = Number(input.value);
+
+  if (
+    input.value.trim() === "" ||
+    !Number.isInteger(guess) ||
+    guess < 1 ||
+    guess > 50
+  ) {
+    message.textContent =
+      "⚠️ Enter a whole number from 1 to 50!";
+    return;
+  }
+
+  chances--;
+  chancesText.textContent = chances;
+
+  if (guess === number) {
+    message.textContent =
+      "🏆 YOU WIN! The secret number was " + number + "!";
+
+    gameOver = true;
+  } else if (chances === 0) {
+    message.textContent =
+      "💥 GAME OVER! The secret number was " + number + ".";
+
+    gameOver = true;
+  } else if (guess < number) {
+    message.textContent =
+      "⬆️ GREATER! Try a bigger number. " +
+      chances + " chances left.";
+  } else {
+    message.textContent =
+      "⬇️ SMALLER! Try a smaller number. " +
+      chances + " chances left.";
+  }
+
+  if (gameOver) {
+    input.disabled = true;
+    guessBtn.disabled = true;
+  } else {
+    input.value = "";
+    input.focus();
+  }
+});
+
+resetBtn.addEventListener("click", startGame);
+
+startGame();
+</script>
+
+</body>
+</html>
